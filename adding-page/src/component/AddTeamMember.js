@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 
 const AddTeamMember = () => {
   const [memberInfo, setMemberInfo] = useState({
@@ -42,12 +43,12 @@ const AddTeamMember = () => {
     if (memberInfo.email.trim().length === 0) {
       tempErrors.email = "Email is required.";
     } else if (
-      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(memberInfo.email)        // Checking if email is in proper format
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(memberInfo.email) // Checking if email is in proper format
     ) {
       tempErrors.email = "Invalid email address.";
     }
     if (memberInfo.phone.trim().length === 0) {
-        tempErrors.phone = "Phone number is required.";
+      tempErrors.phone = "Phone number is required.";
     }
     setErrors(tempErrors);
 
@@ -66,7 +67,18 @@ const AddTeamMember = () => {
   const handleSubmit = () => {
     if (validateInput()) {
       console.log("Validated Data:", memberInfo);
-      // TODO: Handle backend
+
+      const apiUrl = "http://localhost:8000/api/members/add-member";
+      axios
+        .post(apiUrl, memberInfo)
+        .then((response) => {
+          console.log("Member added:", response.data);
+          // Confirmation dialog?
+        })
+        .catch((error) => {
+          console.error("Failed to add member:", error.response.data);
+          // Error dialog?
+        });
     }
   };
 
