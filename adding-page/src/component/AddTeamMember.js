@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-
+import ConfirmationModal from "./ConfirmationModal";
 const AddTeamMember = () => {
   const [memberInfo, setMemberInfo] = useState({
     firstName: "",
@@ -11,6 +11,7 @@ const AddTeamMember = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -64,22 +65,30 @@ const AddTeamMember = () => {
     });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (validateInput()) {
       console.log("Validated Data:", memberInfo);
-
       const apiUrl = "http://localhost:8000/api/members/add-member";
-      axios
-        .post(apiUrl, memberInfo)
-        .then((response) => {
-          console.log("Member added:", response.data);
-          // Confirmation dialog?
-        })
-        .catch((error) => {
-          console.error("Failed to add member:", error.response.data);
-          // Error dialog?
+      try {
+        const response = axios.post(apiUrl, memberInfo);
+        setIsModalOpen(true); // Open the modal
+        // Clear the fields
+        setMemberInfo({
+          firstName: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          role: "regular",
         });
+      } catch (error) {
+        console.error("Failed to add member:", error.response.data);
+      }
     }
+  };
+
+  // Function to close the modal
+  const closeModal = () => {
+    setIsModalOpen(false);
   };
 
   return (
@@ -213,6 +222,9 @@ const AddTeamMember = () => {
           Save
         </button>
       </div>
+      <ConfirmationModal isOpen={isModalOpen} onClose={closeModal}>
+        Data has been added successfully!
+      </ConfirmationModal>
     </div>
   );
 };
