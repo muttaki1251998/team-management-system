@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import ConfirmationModal from "./ConfirmationModal";
 const AddTeamMember = () => {
   const [memberInfo, setMemberInfo] = useState({
     firstName: "",
@@ -11,7 +10,6 @@ const AddTeamMember = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -70,8 +68,7 @@ const AddTeamMember = () => {
       console.log("Validated Data:", memberInfo);
       const apiUrl = "http://localhost:8000/api/members/add-member";
       try {
-        const response = axios.post(apiUrl, memberInfo);
-        setIsModalOpen(true); // Open the modal
+        const response = await axios.post(apiUrl, memberInfo);
         // Clear the fields
         setMemberInfo({
           firstName: "",
@@ -80,20 +77,16 @@ const AddTeamMember = () => {
           phone: "",
           role: "regular",
         });
+        // Redirect to ListPage
+        window.location.href = "http://localhost:3003/";
       } catch (error) {
         console.error("Failed to add member:", error.response.data);
       }
     }
   };
-
-  // Function to close the modal
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+      <div className="bg-white p-8 rounded-lg shadow-lg h-[530px] w-full max-w-md">
         <h2 className="text-2xl font-bold mb-1 text-gray-800">
           Add a team member
         </h2>
@@ -214,17 +207,16 @@ const AddTeamMember = () => {
             </label>
           </div>
         </fieldset>
-        <button
-          className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-          type="button"
-          onClick={handleSubmit}
-        >
-          Save
-        </button>
+        <div className="flex justify-end">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            type="button"
+            onClick={handleSubmit}
+          >
+            Save
+          </button>
+        </div>
       </div>
-      <ConfirmationModal isOpen={isModalOpen} onClose={closeModal}>
-        Data has been added successfully!
-      </ConfirmationModal>
     </div>
   );
 };
